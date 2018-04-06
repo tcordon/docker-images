@@ -1,0 +1,235 @@
+version: '3'
+services:
+  apache_server:
+    container_name: apache_server
+    image: tcordon/apache-php:v0.2
+    build: ../docker-web
+    ports:
+    - "80:80"
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/Energy/Energy-BackEnd/:/var/www/
+  some-rabbit:
+    container_name: some-rabbit
+    image: rabbitmq:3-management
+    hostname: my-rabbit
+    ports:
+    - 5672:5672
+    - 8080:15672
+    environment: 
+    -  RABBITMQ_HIPE_COMPILE=1
+  apache_server_mc:
+    container_name: apache_server_mc
+    image: tcordon/apache-php:v0.2
+    build: ../docker-web
+    depends_on:
+    - some-rabbit
+    ports:
+    - "85:80"
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/var/www/
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin_assets/:/var/www/src/skins
+    links:
+    - some-rabbit:rabbit
+  workers:
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    deploy:
+      mode: replicated
+      replicas: 50
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_1:
+    container_name: rmcskin_worker_proxy_1
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - workers
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_2:
+    container_name: rmcskin_worker_proxy_2
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_1
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_3:
+    container_name: rmcskin_worker_proxy_3
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_2
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_4:
+    container_name: rmcskin_worker_proxy_4
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_3
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_5:
+    container_name: rmcskin_worker_proxy_5
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_4
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_6:
+    container_name: rmcskin_worker_proxy_6
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_5
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_7:
+    container_name: rmcskin_worker_proxy_7
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_6
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_8:
+    container_name: rmcskin_worker_proxy_8
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_7
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_9:
+    container_name: rmcskin_worker_proxy_9
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_8
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
+  worker_10:
+    container_name: rmcskin_worker_proxy_10
+    image: tcordon/php-cli:v0.1
+    build: ../docker-worker
+    depends_on:
+    - some-rabbit
+    - worker_9
+    volumes:
+    - /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp
+    links:
+    - some-rabbit:rabbit
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - php
+      - worker.php
+    working_dir: /usr/src/myapp/src
