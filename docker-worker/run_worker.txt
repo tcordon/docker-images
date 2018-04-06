@@ -1,0 +1,1 @@
+docker run --rm --name rmcskin_worker -v /mnt/hgfs/LOCAL_PROJECTS/rmcskin/:/usr/src/myapp -w /usr/src/myapp/src --link some-rabbit:rabbit tcordon/php-cli:v0.1 php worker.php
